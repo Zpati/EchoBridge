@@ -1,4 +1,4 @@
-# 🧠 VRChat Karşı Taraf Ses Çevirisi - Teknik Analiz & Çözüm Yol Haritası
+﻿# 🧠 VRChat Karşı Taraf Ses Çevirisi - Teknik Analiz & Çözüm Yol Haritası
 
 ## 📌 Giriş: "Neden Karşımdaki Konuşunca Çeviri Tetiklenmiyor?"
 
@@ -53,3 +53,4 @@ Karşı tarafın sesini %100 stüdyo berraklığında çevirmek için uygulanabi
    * Basit desibel/RMS eşiği yerine yapay zeka tabanlı ses aktivitesi dedektörü (Voice Activity Detection - VAD) entegre edilecek. Böylece arkada müzik çalsa bile sadece insan sesi tespit edildiğinde çeviri başlatılacaktır.
 3. **Yerel Whisper AI STT (Faster-Whisper):**
    * Google STT bulut servisi gürültüye dayanıksızdır. Yerel çalışan `faster-whisper-tiny` veya `base` modelleri gürültülü ve müzikli ortamlarda dahi %90+ doğrulukla konuşmayı yazıya dökebilir.
+

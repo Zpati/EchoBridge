@@ -1,7 +1,7 @@
-<div align="center">
+﻿<div align="center">
 
-# 🌐 VRChat AI Translator Pro
-### Enterprise Edition v2.5
+# 🌐 EchoBridge
+### Real-time AI Voice Translator for VRChat · v2.5
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
 [![VRChat OSC](https://img.shields.io/badge/VRChat-OSC%20Compatible-00F5FF.svg?style=for-the-badge&logo=vrchat)](https://docs.vrchat.com/docs/osc-overview)
@@ -66,7 +66,7 @@ graph TD
 1. Download the latest release zip from [Releases](https://github.com/Zpati/VRChat-AI-Translator-Pro/releases)
 2. Extract the zip
 3. Open VRChat → **Settings → OSC → Enable OSC**
-4. Run `dist/VRChat_AI_Translator_Pro/VRChat_AI_Translator_Pro.exe`
+4. Run `dist/EchoBridge/EchoBridge.exe`
 5. Select your mic language, target language, and hit **START**
 
 ### Option B — Run from Source (Python 3.10+)
@@ -131,7 +131,7 @@ pip install pyinstaller
 build.bat
 ```
 
-Output: `dist/VRChat_AI_Translator_Pro/VRChat_AI_Translator_Pro.exe`
+Output: `dist/EchoBridge/EchoBridge.exe`
 
 > [!NOTE]
 > Build excludes torch, tensorflow, scipy, matplotlib to keep EXE lightweight (~8MB core + dependencies).
@@ -212,10 +212,11 @@ MIT License — see [LICENSE](LICENSE)
 <div align="center">
 
 Made with ❤️ for the VRChat community  
-**[Zpati](https://github.com/Zpati)** · **[ShinniUwU](https://github.com/ShinniUwU)** · VRChat AI Translator Pro v2.5
+**[Zpati](https://github.com/Zpati)** · **[ShinniUwU](https://github.com/ShinniUwU)** · EchoBridge v2.5
 
 ---
 
 > 💡 *This project was our original idea. AI was used as a development assistant during the coding process.*
 
 </div>
+

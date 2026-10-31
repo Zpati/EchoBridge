@@ -1,4 +1,4 @@
-# 🤝 Contributing to VRChat AI Translator Pro
+﻿# 🤝 Contributing to EchoBridge
 
 Thank you for your interest in contributing! This document outlines **known limitations**, **missing features**, and **areas where the community can help**.
 
@@ -154,7 +154,7 @@ Thank you for your interest in contributing! This document outlines **known limi
 
 ## 🛠️ How to Contribute
 
-1. Fork this repo: https://github.com/Zpati/VRChat-AI-Translator-Pro
+1. Fork this repo: https://github.com/Zpati/EchoBridge
 2. Create a feature branch: `git checkout -b feature/whisper-integration`
 3. Make your changes in `src/core/` or `src/ui/`
 4. Test with VRChat OSC enabled
@@ -174,7 +174,7 @@ src/ui/locales.py         ← Add new UI language strings here
 
 ## 📣 Community Channels
 
-- GitHub Issues: https://github.com/Zpati/VRChat-AI-Translator-Pro/issues
+- GitHub Issues: https://github.com/Zpati/EchoBridge/issues
 - Vote for VRChat OSC voice output: https://feedback.vrchat.com
 
 ---
@@ -182,3 +182,4 @@ src/ui/locales.py         ← Add new UI language strings here
 > **Most impactful contribution:** If you can implement even a basic version of  
 > **"other players' voice → translated text overlay"** using any approach,  
 > it would be a game-changer for the entire VRChat multilingual community. 🌍
+

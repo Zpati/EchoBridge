@@ -1,8 +1,8 @@
-@echo off
-title VRChat AI Translator Pro - EXE Derleyici
+﻿@echo off
+title EchoBridge - EXE Derleyici
 cd /d "%~dp0"
 echo ========================================================
-echo       VRChat AI Translator Pro - EXE Derleniyor
+echo       EchoBridge - EXE Derleniyor
 echo ========================================================
 echo.
 echo Gerekli kutuphaneler kontrol ediliyor...
@@ -11,7 +11,7 @@ pip install -r requirements.txt
 echo.
 echo PyInstaller ile hafif ve bagimsiz calistirilabilir dosya olusturuluyor...
 pyinstaller --noconfirm --onedir --windowed ^
-    --name "VRChat_AI_Translator_Pro" ^
+    --name "EchoBridge" ^
     --icon "assets\icon.ico" ^
     --add-data "src;src" ^
     --add-data "assets;assets" ^
@@ -26,6 +26,7 @@ pyinstaller --noconfirm --onedir --windowed ^
 
 echo.
 echo ========================================================
-echo Derleme tamamlandi! Cikti: dist\VRChat_AI_Translator_Pro\
+echo Derleme tamamlandi! Cikti: dist\EchoBridge\
 echo ========================================================
 pause
+

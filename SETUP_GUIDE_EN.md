@@ -1,4 +1,4 @@
-# 🚀 VRChat AI Translator Pro — Setup Guide
+﻿# 🚀 EchoBridge — Setup Guide
 
 > **Quick Start for everyone:** No Python, no coding, no setup — just download and run.
 
@@ -16,7 +16,7 @@
 ## 📥 Step 1 — Download
 
 1. Go to the [Releases page](https://github.com/Zpati/VRChat-AI-Translator-Pro/releases)
-2. Download `VRChat_AI_Translator_Pro_v2.5.zip`
+2. Download `EchoBridge_v2.5.zip`
 3. **Right-click** the zip → **Extract All** → Choose a folder (e.g. `Desktop\VRChat Translator`)
 
 ---
@@ -43,8 +43,8 @@
 ## ▶️ Step 3 — Run the App
 
 1. Open the extracted folder
-2. Go into `dist` → `VRChat_AI_Translator_Pro`
-3. Double-click **`VRChat_AI_Translator_Pro.exe`**
+2. Go into `dist` → `EchoBridge`
+3. Double-click **`EchoBridge.exe`**
 
 > [!NOTE]
 > Windows may show a SmartScreen warning ("Windows protected your PC").  
@@ -152,3 +152,4 @@ Or double-click `run.bat`.
 Made with ❤️ for the VRChat community · [Back to README](README.md)
 
 </div>
+

@@ -1,8 +1,8 @@
-@echo off
-title VRChat AI Translator Pro
+﻿@echo off
+title EchoBridge
 cd /d "%~dp0"
 echo ========================================================
-echo         VRChat AI Translator Pro - Baslatiliyor
+echo         EchoBridge - Baslatiliyor
 echo ========================================================
 python main.py
 if %ERRORLEVEL% NEQ 0 (
@@ -12,3 +12,4 @@ if %ERRORLEVEL% NEQ 0 (
     echo Gereksinimleri yuklemek icin: pip install -r requirements.txt
     pause
 )
+

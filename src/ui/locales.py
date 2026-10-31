@@ -1,12 +1,12 @@
-"""
+﻿"""
 UI Localization Strings (English & Turkish)
 Allows full interface language switching on the fly.
 """
 
 STRINGS = {
     "en": {
-        "app_title": "VRChat AI Translator Pro — Neural OSC Engine",
-        "header_title": "⚡ VRCHAT AI TRANSLATOR PRO",
+        "app_title": "ECHOBRIDGE — Neural OSC Engine",
+        "header_title": "⚡ ECHOBRIDGE",
         "header_subtitle": "Dual-Channel Neural Translation & VRChat OSC Bridge • v2.5 Enterprise Edition",
         "topmost": "📌 Always On Top",
         "ui_lang": "Language",
@@ -37,8 +37,8 @@ STRINGS = {
         "lang_changed_spk": "🌐 Game audio translation set: {src} ➔ {tgt}"
     },
     "tr": {
-        "app_title": "VRChat AI Translator Pro — Neural OSC Engine",
-        "header_title": "⚡ VRCHAT AI TRANSLATOR PRO",
+        "app_title": "ECHOBRIDGE — Neural OSC Engine",
+        "header_title": "⚡ ECHOBRIDGE",
         "header_subtitle": "Çift Yönlü Yapay Zeka Çeviri & VRChat OSC Köprüsü • v2.5 Enterprise Edition",
         "topmost": "📌 Her Zaman Üstte",
         "ui_lang": "Dil",
@@ -69,3 +69,4 @@ STRINGS = {
         "lang_changed_spk": "🌐 Oyun Sesi Dili Değiştirildi: {src} ➔ {tgt}"
     }
 }
+
