@@ -1,6 +1,6 @@
-# 🎮 VRChat AI Translator Pro — Adım Adım Kurulum ve Kullanım Rehberi
+# 🌐 EchoBridge — Adım Adım Kurulum ve Kullanım Rehberi
 
-Bu rehber, uygulamanın sizin veya başka bir kullanıcının bilgisayarında sıfırdan sorunsuz şekilde nasıl çalıştırılacağını anlatır.
+Bu rehber, EchoBridge uygulamasının sizin veya başka bir kullanıcının bilgisayarında sıfırdan sorunsuz şekilde nasıl çalıştırılacağını anlatır.
 
 ---
 
@@ -9,24 +9,33 @@ Bu rehber, uygulamanın sizin veya başka bir kullanıcının bilgisayarında s�
 **Evet! Kesinlikle ve en pratik şekilde çalışır.**
 
 Artık projenin içinde derlenmiş hazır bir `.exe` bulunmaktadır:
-* `dist\VRChat_AI_Translator_Pro\VRChat_AI_Translator_Pro.exe` dosyasına çift tıklamanız yeterlidir.
+* ZIP'i çıkardıktan sonra **`EchoBridge.exe`** dosyasına çift tıklamanız yeterlidir.
 * Karşı taraftaki kişinin bilgisayarında **Python, terminal, kod veya bat dosyasıyla hiçbir işi yoktur.**
 * Doğrudan çalışır ve sağ üstteki menüden arayüz dilini anında **English** veya **Türkçe** yapabilirsiniz.
 
 ---
 
+## 📥 0. Adım: İndirme
+
+1. [Releases sayfasına](https://github.com/Zpati/EchoBridge/releases) gidin
+2. **`EchoBridge_v2.5.zip`** dosyasını indirin
+3. ZIP dosyasına sağ tıklayın → **Tümünü Çıkar** → Bir klasör seçin (örn. `Masaüstü\EchoBridge`)
+
+---
+
 ## 🛠️ 1. Adım: Bilgisayarda Hazırlık ve Kurulum
 
-### A) Python Kurulu Değilse:
+### A) Doğrudan EXE Kullanıyorsanız (Önerilen):
+Python veya başka bir şey kurmanıza **gerek yoktur**. Direkt `EchoBridge.exe` çalıştırın.
+
+### B) Kaynak Koddan Çalıştırıyorsanız (Geliştirici):
 1. [python.org](https://www.python.org/downloads/) adresinden güncel Python sürümünü indirin.
 2. ⚠️ **ÖNEMLİ:** Kurulum ekranının altındaki **"Add python.exe to PATH"** kutucuğunu mutlaka işaretleyin!
-
-### B) Bağımlılıkların Yüklenmesi:
-Klasörün içinde boş bir yere `Shift + Sağ Tık` yapıp **"PowerShell Penceresini Buradan Aç"** (veya Terminal) deyin ve şu komutu yazın:
+3. Klasörün içinde boş bir yere `Shift + Sağ Tık` yapıp **"PowerShell Penceresini Buradan Aç"** (veya Terminal) deyin:
 ```bash
 pip install -r requirements.txt
 ```
-*(Veya doğrudan klasördeki `run.bat` dosyasına çift tıklayabilirsiniz, eksik varsa otomatik uyaracaktır.)*
+*(Veya doğrudan klasördeki `run.bat` dosyasına çift tıklayabilirsiniz.)*
 
 ---
 
@@ -45,14 +54,15 @@ VRChat'te chatbox balonuna yazı gönderebilmek için oyun içinden **OSC** öze
    * **`Enabled`** (Etkin) butonuna basarak **AÇIK** konuma getirin.
 4. Artık VRChat, bilgisayarınızdan gönderilen çeviri mesajlarını kabul etmeye hazırdır!
 
-> 💡 **Not:** VRChat varsayılan olarak **9000** portunu dinler. Programımız da otomatik olarak bu porta (`127.0.0.1:9000`) bağlıdır, ekstra bir port ayarı yapmanıza gerek yoktur.
+> 💡 **Not:** VRChat varsayılan olarak **9000** portunu dinler. EchoBridge de otomatik olarak bu porta (`127.0.0.1:9000`) bağlıdır, ekstra bir port ayarı yapmanıza gerek yoktur.
 
 ---
 
-## 🚀 3. Adım: Uygulamayı Başlatma ve Kullanma
+## 🚀 3. Adım: EchoBridge'i Başlatma ve Kullanma
 
-1. Klasördeki **`run.bat`** dosyasına çift tıklayın (veya terminalden `python main.py`).
-2. Karşınıza **Cyberpunk / AI Dark HUD** temalı modern arayüz gelecektir.
+1. **`EchoBridge.exe`** dosyasına çift tıklayın.
+2. Windows SmartScreen uyarısı çıkarsa → **"Daha Fazla Bilgi"** → **"Yine de Çalıştır"** seçin (güvenlidir, açık kaynaklıdır).
+3. Karşınıza **Cyberpunk / AI Dark HUD** temalı modern arayüz gelecektir.
 
 ### 🎙️ Mikrofon Çevirisi (Siz ➔ VRChat):
 * Dil kutularından kaynak dili (örn. **Türkçe**) ve hedef dili (örn. **English**) seçin.
@@ -73,9 +83,18 @@ VRChat'te chatbox balonuna yazı gönderebilmek için oyun içinden **OSC** öze
 
 ---
 
-## 📦 4. Adım: EXE Haline Getirme (Dağıtım İçin)
+## 📦 4. Adım: EXE Haline Getirme (Kaynak Koddan)
 
-Arkadaşlarınıza veya topluluğa Python kurdurmadan programı vermek için:
+Kaynak koddan kendiniz derlemek isterseniz:
 1. Klasördeki **`build.bat`** dosyasına çift tıklayın.
-2. PyInstaller projeyi otomatik olarak `dist\VRChat_AI_Translator_Pro\` klasörüne derleyecektir.
+2. PyInstaller projeyi otomatik olarak `dist\EchoBridge\` klasörüne derleyecektir.
 3. O klasörü zipleyip istediğiniz kişiye gönderebilirsiniz!
+
+---
+
+<div align="center">
+
+EchoBridge ile dil bariyerini kır 🌍  
+**[GitHub](https://github.com/Zpati/EchoBridge)** · [English Guide](SETUP_GUIDE_EN.md)
+
+</div>

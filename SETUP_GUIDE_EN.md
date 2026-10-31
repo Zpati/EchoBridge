@@ -15,7 +15,7 @@
 
 ## 📥 Step 1 — Download
 
-1. Go to the [Releases page](https://github.com/Zpati/VRChat-AI-Translator-Pro/releases)
+1. Go to the [Releases page](https://github.com/Zpati/EchoBridge/releases)
 2. Download `EchoBridge_v2.5.zip`
 3. **Right-click** the zip → **Extract All** → Choose a folder (e.g. `Desktop\VRChat Translator`)
 
@@ -130,15 +130,15 @@ Click the **language button** in the top-right corner of the app to switch betwe
 ## 🐛 Found a Bug?
 
 Open an issue on GitHub:  
-👉 [https://github.com/Zpati/VRChat-AI-Translator-Pro/issues](https://github.com/Zpati/VRChat-AI-Translator-Pro/issues)
+👉 [https://github.com/Zpati/EchoBridge/issues](https://github.com/Zpati/EchoBridge/issues)
 
 ---
 
 ## 🔨 Want to Run from Source Code?
 
 ```bash
-git clone https://github.com/Zpati/VRChat-AI-Translator-Pro.git
-cd VRChat-AI-Translator-Pro
+git clone https://github.com/Zpati/EchoBridge.git
+cd EchoBridge
 pip install -r requirements.txt
 python main.py
 ```
@@ -152,4 +152,5 @@ Or double-click `run.bat`.
 Made with ❤️ for the VRChat community · [Back to README](README.md)
 
 </div>
+
 
