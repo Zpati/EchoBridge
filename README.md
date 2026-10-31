@@ -15,7 +15,7 @@
 **Real-time AI-powered translator for VRChat** — Speak in your language, everyone understands.  
 Dual-channel: **Mic → VRChat Chatbox** and **Game Audio → UI overlay**.
 
-[🚀 Download EXE](#-quick-start) · [📖 Turkish Setup Guide](SETUP_GUIDE_TR.md) · [⚠️ Known Limitations](TECHNICAL_LIMITATIONS.md) · [🐛 Report Bug](https://github.com/Zpati/VRChat-AI-Translator-Pro/issues)
+[🚀 Download EXE](#-quick-start) · [📖 English Setup Guide](SETUP_GUIDE_EN.md) · [📖 Türkçe Kurulum](SETUP_GUIDE_TR.md) · [⚠️ Known Limitations](TECHNICAL_LIMITATIONS.md) · [🐛 Report Bug](https://github.com/Zpati/VRChat-AI-Translator-Pro/issues)
 
 </div>
 
