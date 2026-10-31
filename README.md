@@ -212,6 +212,15 @@ MIT License — see [LICENSE](LICENSE)
 <div align="center">
 
 Made with ❤️ for the VRChat community  
-**[Zpati](https://github.com/Zpati)** · VRChat AI Translator Pro v2.5
+**[Zpati](https://github.com/Zpati)** · **[ShinniUwU](https://github.com/ShinniUwU)** · VRChat AI Translator Pro v2.5
+
+---
+
+### 🤖 AI Assistance
+
+This project was designed and built with the assistance of **[Google Antigravity](https://antigravity.dev)** (Gemini AI).  
+Architecture, UI code, OSC integration, EXE packaging, and documentation were all developed in collaboration with AI pair programming.
+
+> *"We believe in transparency — AI was our co-pilot, humans were at the wheel."*
 
 </div>
