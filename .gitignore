@@ -18,3 +18,7 @@ config.json
 .vscode/
 .idea/
 *.tmp
+
+# Release packages
+*.zip
+
