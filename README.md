@@ -7,15 +7,15 @@
 [![VRChat OSC](https://img.shields.io/badge/VRChat-OSC%20Compatible-00F5FF.svg?style=for-the-badge&logo=vrchat)](https://docs.vrchat.com/docs/osc-overview)
 [![GUI CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter%20CyberHUD-8B5CF6.svg?style=for-the-badge)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg?style=for-the-badge)](LICENSE)
-[![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4.svg?style=for-the-badge&logo=windows)](https://github.com/Zpati/VRChat-AI-Translator-Pro)
-[![Release](https://img.shields.io/badge/Release-v2.5-FF6B35.svg?style=for-the-badge)](https://github.com/Zpati/VRChat-AI-Translator-Pro/releases)
+[![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4.svg?style=for-the-badge&logo=windows)](https://github.com/Zpati/EchoBridge)
+[![Release](https://img.shields.io/badge/Release-v2.5-FF6B35.svg?style=for-the-badge)](https://github.com/Zpati/EchoBridge/releases)
 
 <br/>
 
 **Real-time AI-powered translator for VRChat** — Speak in your language, everyone understands.  
 Dual-channel: **Mic → VRChat Chatbox** and **Game Audio → UI overlay**.
 
-[🚀 Download EXE](#-quick-start) · [📖 English Setup Guide](SETUP_GUIDE_EN.md) · [📖 Türkçe Kurulum](SETUP_GUIDE_TR.md) · [⚠️ Known Limitations](TECHNICAL_LIMITATIONS.md) · [🐛 Report Bug](https://github.com/Zpati/VRChat-AI-Translator-Pro/issues)
+[🚀 Download EXE](#-quick-start) · [📖 English Setup Guide](SETUP_GUIDE_EN.md) · [📖 Türkçe Kurulum](SETUP_GUIDE_TR.md) · [⚠️ Known Limitations](TECHNICAL_LIMITATIONS.md) · [🐛 Report Bug](https://github.com/Zpati/EchoBridge/issues)
 
 </div>
 
@@ -63,17 +63,17 @@ graph TD
 
 ### Option A — Standalone EXE (Recommended, No Python Needed)
 
-1. Download the latest release zip from [Releases](https://github.com/Zpati/VRChat-AI-Translator-Pro/releases)
+1. Download the latest release zip from [Releases](https://github.com/Zpati/EchoBridge/releases)
 2. Extract the zip
 3. Open VRChat → **Settings → OSC → Enable OSC**
-4. Run `dist/EchoBridge/EchoBridge.exe`
+4. Run `EchoBridge.exe`
 5. Select your mic language, target language, and hit **START**
 
 ### Option B — Run from Source (Python 3.10+)
 
 ```bash
-git clone https://github.com/Zpati/VRChat-AI-Translator-Pro.git
-cd VRChat-AI-Translator-Pro
+git clone https://github.com/Zpati/EchoBridge.git
+cd EchoBridge
 pip install -r requirements.txt
 python main.py
 ```
@@ -219,4 +219,5 @@ Made with ❤️ for the VRChat community
 > 💡 *This project was our original idea. AI was used as a development assistant during the coding process.*
 
 </div>
+
 
