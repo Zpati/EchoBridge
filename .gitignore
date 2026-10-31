@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller & Build artifacts
+build/
+dist/
+*.spec
+*.exe
+_internal/
+VRChat_Translator.exe
+VRChat_Translator.exe_extracted/
+
+# Local configuration overrides & caches
+config.json
+*.log
+.vscode/
+.idea/
+*.tmp
