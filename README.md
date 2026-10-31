@@ -216,11 +216,6 @@ Made with ❤️ for the VRChat community
 
 ---
 
-### 🤖 AI Assistance
-
-This project was designed and built with the assistance of **[Google Antigravity](https://antigravity.dev)** (Gemini AI).  
-Architecture, UI code, OSC integration, EXE packaging, and documentation were all developed in collaboration with AI pair programming.
-
-> *"We believe in transparency — AI was our co-pilot, humans were at the wheel."*
+> 💡 *This project was our original idea. AI was used as a development assistant during the coding process.*
 
 </div>
