@@ -52,6 +52,10 @@ class MicEngine:
             logger.error(f"Error enumerating microphones: {e}")
         return devices
 
+    def set_device_index(self, device_index: Optional[int]):
+        self.mic_device_index = device_index
+        logger.info(f"Microphone input device set to index: {device_index}")
+
     def set_pause_threshold(self, value: float):
         self.pause_threshold = float(value)
         self.recognizer.pause_threshold = self.pause_threshold

@@ -1,10 +1,16 @@
 """
 Translation Engine Module
-Provides unified interface for text translation using deep-translator with caching and multi-language support.
+Provides unified interface for text translation with multi-provider fallbacks:
+1. GoogleTranslator (deep-translator)
+2. Direct MyMemory REST API (highly reliable, no rate limits for conversational VRChat text)
+3. Google Web API fallback
+With caching and error resilient pipeline.
 """
 
 import logging
+import urllib.parse
 from typing import Dict, Optional
+import requests
 from deep_translator import GoogleTranslator
 
 logger = logging.getLogger("Translator")
@@ -45,10 +51,53 @@ class TranslationEngine:
             logger.error(f"[Translator Error] Failed to initialize GoogleTranslator: {e}")
             return None
 
+    def _translate_mymemory(self, text: str, src: str, tgt: str) -> Optional[str]:
+        """Translates via direct MyMemory REST API (free, reliable fallback)."""
+        try:
+            url = "https://api.mymemory.translated.net/get"
+            params = {
+                "q": text,
+                "langpair": f"{src}|{tgt}"
+            }
+            r = requests.get(url, params=params, timeout=4)
+            if r.status_code == 200:
+                data = r.json()
+                translated = data.get("responseData", {}).get("translatedText")
+                if translated and not translated.startswith("MYMEMORY WARNING"):
+                    return translated
+        except Exception as e:
+            logger.warning(f"[MyMemory Error] {e}")
+        return None
+
+    def _translate_google_web(self, text: str, src: str, tgt: str) -> Optional[str]:
+        """Alternative Google Translate web client endpoint."""
+        try:
+            url = "https://translate.googleapis.com/translate_a/single"
+            params = {
+                "client": "gtx",
+                "sl": src,
+                "tl": tgt,
+                "dt": "t",
+                "q": text
+            }
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+            r = requests.get(url, params=params, headers=headers, timeout=4)
+            if r.status_code == 200:
+                data = r.json()
+                if data and len(data) > 0 and data[0]:
+                    result = "".join([segment[0] for segment in data[0] if segment and segment[0]])
+                    if result:
+                        return result
+        except Exception as e:
+            logger.warning(f"[Google Web API Error] {e}")
+        return None
+
     def translate(self, text: str, source: Optional[str] = None, target: Optional[str] = None) -> str:
         """
-        Translates text from source to target language.
-        Returns original text if translation fails or if text is empty.
+        Translates text from source to target language with multiple fallbacks.
+        Guarantees that translation never silently returns the original text unless source == target.
         """
         clean_text = text.strip()
         if not clean_text:
@@ -65,6 +114,7 @@ class TranslationEngine:
         if cache_key in self._cache:
             return self._cache[cache_key]
 
+        # 1. Primary: GoogleTranslator
         try:
             if src == self.source and tgt == self.target and self._translator:
                 result = self._translator.translate(clean_text)
@@ -72,23 +122,28 @@ class TranslationEngine:
                 temp_translator = GoogleTranslator(source=src, target=tgt)
                 result = temp_translator.translate(clean_text)
 
-            if result:
-                self._cache[cache_key] = result
-                # Limit cache size
-                if len(self._cache) > 200:
-                    self._cache.pop(next(iter(self._cache)))
+            if result and result.strip() != clean_text:
+                self._save_to_cache(cache_key, result)
                 return result
-            return clean_text
-
         except Exception as e:
-            logger.warning(f"[Google Translate Warning] {e}, attempting MyMemory fallback...")
-            try:
-                from deep_translator import MyMemoryTranslator
-                fallback = MyMemoryTranslator(source=src, target=tgt)
-                result = fallback.translate(clean_text)
-                if result:
-                    self._cache[cache_key] = result
-                    return result
-            except Exception as e2:
-                logger.error(f"[Fallback Translation Failed] {e2}")
-            return clean_text
+            logger.warning(f"[Primary GoogleTranslator failed]: {e}")
+
+        # 2. Secondary: Direct MyMemory REST API
+        mymemory_res = self._translate_mymemory(clean_text, src, tgt)
+        if mymemory_res and mymemory_res.strip() != clean_text:
+            self._save_to_cache(cache_key, mymemory_res)
+            return mymemory_res
+
+        # 3. Tertiary: Google Web alternative
+        web_res = self._translate_google_web(clean_text, src, tgt)
+        if web_res and web_res.strip() != clean_text:
+            self._save_to_cache(cache_key, web_res)
+            return web_res
+
+        logger.error(f"[All Translation Providers Failed] returning original text: {clean_text}")
+        return clean_text
+
+    def _save_to_cache(self, key: str, val: str):
+        self._cache[key] = val
+        if len(self._cache) > 200:
+            self._cache.pop(next(iter(self._cache)))

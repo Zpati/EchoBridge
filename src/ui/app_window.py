@@ -281,7 +281,36 @@ class AppWindow(ctk.CTk):
         tgt_dropdown.set(default_tgt)
         tgt_dropdown.pack(side="left", padx=(4, 0))
 
-        # Slider / Threshold Control Row
+        # Device Selection Helper
+        self.mic_devices = self._get_unique_input_devices()
+        self.mic_device_names = [d["name"] for d in self.mic_devices]
+
+        # Slider / Threshold & Device Control Row
+        device_row = ctk.CTkFrame(card, fg_color="transparent")
+        device_row.pack(fill="x", padx=14, pady=(2, 4))
+
+        if is_mic:
+            lbl_dev = ctk.CTkLabel(device_row, text=self._t("device_select"), font=FONT_SMALL, text_color=TEXT_SECONDARY)
+            lbl_dev.pack(side="left", padx=(0, 6))
+
+            dev_values = self.mic_device_names if self.mic_device_names else ["Varsayılan Mikrofon (Default)"]
+            saved_dev = self.config.get("mic_device_name", dev_values[0])
+            if saved_dev not in dev_values:
+                saved_dev = dev_values[0]
+
+            self.mic_dev_menu = ctk.CTkOptionMenu(
+                device_row,
+                values=dev_values,
+                command=self._on_mic_device_change,
+                font=FONT_SMALL,
+                fg_color=BG_MAIN,
+                button_color=BORDER_COLOR,
+                height=26
+            )
+            self.mic_dev_menu.set(saved_dev)
+            self.mic_dev_menu.pack(side="left", fill="x", expand=True)
+            self.lbl_mic_dev = lbl_dev
+
         slider_row = ctk.CTkFrame(card, fg_color="transparent")
         slider_row.pack(fill="x", padx=14, pady=4)
 
@@ -427,6 +456,34 @@ class AppWindow(ctk.CTk):
         self.config.set("ui_lang", self.current_locale)
         self._apply_ui_locale()
 
+    def _get_unique_input_devices(self):
+        """Lists distinct microphone input devices."""
+        import speech_recognition as sr
+        devices = [{"name": "Varsayılan Mikrofon (Default)", "index": None}]
+        try:
+            names = sr.Microphone.list_microphone_names()
+            seen = set()
+            for idx, name in enumerate(names):
+                # Clean up display name
+                clean_name = name.strip()
+                if clean_name not in seen and ("Mikrofon" in clean_name or "Microphone" in clean_name or "Input" in clean_name):
+                    seen.add(clean_name)
+                    devices.append({"name": f"[{idx}] {clean_name}", "index": idx})
+        except Exception:
+            pass
+        return devices
+
+    def _on_mic_device_change(self, selected_name: str):
+        self.config.set("mic_device_name", selected_name)
+        dev_index = None
+        for d in self.mic_devices:
+            if d["name"] == selected_name:
+                dev_index = d["index"]
+                break
+        self.config.set("mic_device_index", dev_index)
+        self.mic_engine.set_device_index(dev_index)
+        self.log_mic(f"🎤 Mikrofon Cihazı Seçildi: {selected_name}")
+
     def _apply_ui_locale(self):
         """Updates all UI text elements instantly without app restart."""
         self.title(self._t("app_title"))
@@ -436,6 +493,8 @@ class AppWindow(ctk.CTk):
 
         self.lbl_mic_title.configure(text=self._t("mic_title"))
         self.lbl_mic_hotkey.configure(text=self._t("mic_hotkey"))
+        if hasattr(self, 'lbl_mic_dev'):
+            self.lbl_mic_dev.configure(text=self._t("device_select"))
         self.lbl_mic_pause.configure(text=f"{self._t('silence_wait')}: {self.config.get('mic_pause_threshold', 1.2)}s")
 
         self.lbl_spk_title.configure(text=self._t("speaker_title"))

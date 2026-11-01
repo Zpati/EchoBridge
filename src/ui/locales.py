@@ -1,4 +1,4 @@
-﻿"""
+"""
 UI Localization Strings (English & Turkish)
 Allows full interface language switching on the fly.
 """
@@ -20,6 +20,7 @@ STRINGS = {
         "status_err": "⚠️ ERROR",
         "silence_wait": "Silence Timeout",
         "sound_thresh": "Noise Gate Threshold",
+        "device_select": "Audio Device:",
         "quick_label": "💬 Quick Chatbox Dispatcher:",
         "quick_placeholder": "Type message and press Enter or Send (instantly sends to VRChat chatbox)...",
         "quick_send_btn": "🚀 Send to VRChat",
@@ -52,6 +53,7 @@ STRINGS = {
         "status_err": "⚠️ HATA",
         "silence_wait": "Sessizlik Bekleme",
         "sound_thresh": "Ses Algılama Eşiği",
+        "device_select": "Ses Cihazı:",
         "quick_label": "💬 Hızlı Chatbox Gönderici:",
         "quick_placeholder": "Buraya bir metin yazıp Enter'a basın veya Gönder'e tıklayın...",
         "quick_send_btn": "🚀 VRChat'e Gönder",
