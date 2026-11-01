@@ -15,7 +15,7 @@
 **Real-time AI-powered speech translator for VRChat** — Speak in your native language, and let your avatar communicate with the world.  
 Seamless pipeline: **Microphone Input → Multi-Engine AI Translation → VRChat Avatar Chatbox via OSC**.
 
-[🚀 Download EXE](#-quick-start) · [📖 English Setup Guide](SETUP_GUIDE_EN.md) · [📖 Türkçe Kurulum](SETUP_GUIDE_TR.md) · [🐛 Report Bug](https://github.com/Zpati/EchoBridge/issues)
+[🚀 Download EXE](#-quick-start) · [📖 English Setup Guide](SETUP_GUIDE_EN.md) · [📖 Türkçe Kurulum](SETUP_GUIDE_TR.md) · [🏆 Community Challenge](COMMUNITY_CHALLENGE.md) · [🐛 Report Bug](https://github.com/Zpati/EchoBridge/issues)
 
 </div>
 
@@ -121,6 +121,18 @@ EchoBridge/
 ├── SETUP_GUIDE_TR.md          # Türkçe kurulum rehberi
 └── LICENSE                    # MIT License
 ```
+
+---
+
+## 🏆 Community Bounty & Challenge (Calling Developers!)
+
+> ❓ **"Can we translate other players' speech into our VR headset?"**  
+> We have tackled **Mic ➔ VRChat Chatbox** translation. The next frontier is capturing remote players' voices and rendering translated subtitles.  
+> 
+> Because VRChat does not expose incoming player audio over OSC, this requires innovative approaches like **companion client mods (MelonLoader / BepInEx)** or **AI audio stream separation**.
+
+👉 **Read the full developer challenge & roadmap:** [COMMUNITY_CHALLENGE.md](COMMUNITY_CHALLENGE.md)  
+All contributors who help solve this will be permanently featured in the core team and project credits!
 
 ---
 
