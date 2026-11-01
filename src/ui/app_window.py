@@ -1,30 +1,27 @@
 """
-Main Application GUI for VRChat Translator Pro
-High-tech AI Cyberpunk HUD interface with dual translation channels,
-audio sensitivity calibrators, OSC manual dispatcher, and persistent configuration.
-Supports dynamic UI Language switching (English & Türkçe).
+Main Application GUI Window
+Cyberpunk / AI Dark HUD Theme with CustomTkinter.
+Focused solely on Microphone-to-VRChat OSC Neural Translation.
 """
 
 import time
-import ctypes
 import threading
+import ctypes
 import customtkinter as ctk
-from typing import Optional
 
-from .theme import (
+from src.config import ConfigManager
+from src.core.osc_client import VRChatOSCClient
+from src.core.translator import TranslationEngine, SUPPORTED_LANGUAGES
+from src.core.mic_engine import MicEngine
+from src.ui.locales import STRINGS
+from src.ui.theme import (
     BG_MAIN, BG_CARD, BG_TERMINAL, BORDER_COLOR,
     CYBER_CYAN, NEON_PURPLE, NEON_BLUE,
-    STATUS_ONLINE, STATUS_BUSY, STATUS_OFFLINE,
-    TEXT_PRIMARY, TEXT_SECONDARY, TEXT_CYAN, TEXT_EMERALD,
+    TEXT_PRIMARY, TEXT_SECONDARY, TEXT_CYAN,
+    STATUS_ONLINE, STATUS_OFFLINE, STATUS_BUSY,
     FONT_TITLE, FONT_SUBTITLE, FONT_CARD_HEADER, FONT_LABEL,
-    FONT_BADGE, FONT_MONO, FONT_SMALL
+    FONT_MONO, FONT_SMALL, FONT_BADGE
 )
-from .locales import STRINGS
-from ..config import ConfigManager
-from ..core.osc_client import VRChatOSCClient
-from ..core.translator import TranslationEngine, SUPPORTED_LANGUAGES
-from ..core.mic_engine import MicEngine
-from ..core.speaker_engine import SpeakerEngine
 
 
 class AppWindow(ctk.CTk):
@@ -32,13 +29,13 @@ class AppWindow(ctk.CTk):
         super().__init__()
         self.config = config
 
-        # UI Language: "en" or "tr" (default English for GitHub international standard)
+        # UI Language: "en" or "tr"
         self.current_locale = self.config.get("ui_lang", "en")
 
         # Configure Main Window
         self.title(self._t("app_title"))
-        self.geometry("1180x760")
-        self.minsize(980, 680)
+        self.geometry("820x720")
+        self.minsize(760, 640)
         self.configure(fg_color=BG_MAIN)
         self.attributes("-topmost", self.config.get("always_on_top", True))
 
@@ -59,41 +56,31 @@ class AppWindow(ctk.CTk):
             port=self.config.get("osc_port", 9000)
         )
 
-        # Translators
+        # Translator (Mic)
         mic_src = SUPPORTED_LANGUAGES.get(self.config.get("mic_source_lang", "Türkçe (tr)"), "tr")
         mic_tgt = SUPPORTED_LANGUAGES.get(self.config.get("mic_target_lang", "English (en)"), "en")
         self.mic_translator = TranslationEngine(default_source=mic_src, default_target=mic_tgt)
 
-        spk_src = SUPPORTED_LANGUAGES.get(self.config.get("speaker_source_lang", "English (en)"), "en")
-        spk_tgt = SUPPORTED_LANGUAGES.get(self.config.get("speaker_target_lang", "Türkçe (tr)"), "tr")
-        self.speaker_translator = TranslationEngine(default_source=spk_src, default_target=spk_tgt)
-
-        # Engines
+        # Mic Engine
         self.mic_engine = MicEngine(
             osc_client=self.osc_client,
             translator=self.mic_translator,
             pause_threshold=self.config.get("mic_pause_threshold", 1.2),
             energy_threshold=self.config.get("mic_energy_threshold", 250),
-            stt_lang=mic_src
-        )
-
-        self.speaker_engine = SpeakerEngine(
-            translator=self.speaker_translator,
-            energy_threshold=self.config.get("speaker_energy_threshold", 400),
-            pause_threshold=self.config.get("speaker_pause_threshold", 1.0),
-            stt_lang=spk_src
+            stt_lang=mic_src,
+            mic_device_index=self.config.get("mic_device_index", None)
         )
 
         # Build Interface
         self._build_header()
-        self._build_main_split()
+        self._build_mic_card()
         self._build_quick_osc_bar()
         self._build_footer()
 
         # Apply current strings
         self._apply_ui_locale()
 
-        # Start Global Hotkey Listener
+        # Start Global Hotkey Listener (F4)
         self._start_hotkey_thread()
 
     def _t(self, key: str) -> str:
@@ -104,7 +91,7 @@ class AppWindow(ctk.CTk):
     # UI BUILDERS
     # -------------------------------------------------------------
     def _build_header(self):
-        """Top Cyberpunk Header with Status Badges, Language Switcher and OSC Settings"""
+        """Top Cyberpunk Header with Status Badges and Language Switcher"""
         header_frame = ctk.CTkFrame(self, fg_color=BG_CARD, border_color=BORDER_COLOR, border_width=1, corner_radius=12)
         header_frame.pack(fill="x", padx=16, pady=(14, 10))
 
@@ -159,12 +146,11 @@ class AppWindow(ctk.CTk):
             variable=self.topmost_var,
             command=self._toggle_topmost,
             fg_color=NEON_BLUE,
-            hover_color=CYBER_CYAN,
-            text_color=TEXT_PRIMARY
+            hover_color=CYBER_CYAN
         )
         self.topmost_chk.pack(side="right", padx=10)
 
-        # OSC Status Pill
+        # OSC Badge
         osc_status_lbl = ctk.CTkLabel(
             right_box,
             text=f"🌐 OSC: {self.config.get('osc_ip', '127.0.0.1')}:{self.config.get('osc_port', 9000)}",
@@ -177,200 +163,142 @@ class AppWindow(ctk.CTk):
         )
         osc_status_lbl.pack(side="right", padx=10)
 
-    def _build_main_split(self):
-        """Two main cards: Left for Mic (You -> VRChat), Right for Speaker (Game -> You)"""
+    def _build_mic_card(self):
+        """Unified, prominent card for Microphone-to-VRChat Translation"""
         container = ctk.CTkFrame(self, fg_color="transparent")
         container.pack(fill="both", expand=True, padx=16, pady=4)
-        container.grid_columnconfigure((0, 1), weight=1)
-        container.grid_rowconfigure(0, weight=1)
 
-        # Left: Mic Card
-        self.mic_card = self._create_channel_card(
-            parent=container,
-            col=0,
-            title_key="mic_title",
-            accent=NEON_PURPLE,
-            hotkey_key="mic_hotkey",
-            is_mic=True
-        )
-
-        # Right: Speaker Card
-        self.speaker_card = self._create_channel_card(
-            parent=container,
-            col=1,
-            title_key="speaker_title",
-            accent=CYBER_CYAN,
-            hotkey_key="speaker_hotkey",
-            is_mic=False
-        )
-
-    def _create_channel_card(self, parent, col: int, title_key: str, accent: str, hotkey_key: str, is_mic: bool) -> ctk.CTkFrame:
-        card = ctk.CTkFrame(parent, fg_color=BG_CARD, border_color=BORDER_COLOR, border_width=1, corner_radius=12)
-        card.grid(row=0, column=col, sticky="nsew", padx=6, pady=4)
+        card = ctk.CTkFrame(container, fg_color=BG_CARD, border_color=BORDER_COLOR, border_width=1, corner_radius=12)
+        card.pack(fill="both", expand=True)
 
         # Card Header
         top = ctk.CTkFrame(card, fg_color="transparent")
-        top.pack(fill="x", padx=14, pady=(12, 6))
+        top.pack(fill="x", padx=16, pady=(14, 6))
 
-        title_lbl = ctk.CTkLabel(top, text=self._t(title_key), font=FONT_CARD_HEADER, text_color=accent)
-        title_lbl.pack(side="left")
+        self.lbl_mic_title = ctk.CTkLabel(top, text=self._t("mic_title"), font=FONT_CARD_HEADER, text_color=NEON_PURPLE)
+        self.lbl_mic_title.pack(side="left")
 
-        hotkey_lbl = ctk.CTkLabel(top, text=self._t(hotkey_key), font=FONT_SMALL, text_color=TEXT_SECONDARY)
-        hotkey_lbl.pack(side="right")
+        self.lbl_mic_hotkey = ctk.CTkLabel(top, text=self._t("mic_hotkey"), font=FONT_SMALL, text_color=TEXT_SECONDARY)
+        self.lbl_mic_hotkey.pack(side="right")
 
         # Status & Toggle Row
         status_row = ctk.CTkFrame(card, fg_color="transparent")
-        status_row.pack(fill="x", padx=14, pady=4)
+        status_row.pack(fill="x", padx=16, pady=4)
 
-        status_lbl = ctk.CTkLabel(
+        self.lbl_mic_status = ctk.CTkLabel(
             status_row,
             text=self._t("status_off"),
             font=FONT_BADGE,
             text_color=STATUS_OFFLINE,
             fg_color="#2D1215",
             corner_radius=6,
-            padx=8,
-            pady=2
+            padx=10,
+            pady=3
         )
-        status_lbl.pack(side="left")
+        self.lbl_mic_status.pack(side="left")
 
-        switch_var = ctk.StringVar(value="off")
-        switch = ctk.CTkSwitch(
+        self.switch_mic_var = ctk.StringVar(value="off")
+        self.switch_mic = ctk.CTkSwitch(
             status_row,
             text="",
-            variable=switch_var,
+            variable=self.switch_mic_var,
             onvalue="on",
             offvalue="off",
             progress_color=STATUS_ONLINE,
-            command=self._on_mic_toggle if is_mic else self._on_speaker_toggle
+            command=self._on_mic_toggle
         )
-        switch.pack(side="right")
+        self.switch_mic.pack(side="right")
 
         # Language Selection Row
         lang_row = ctk.CTkFrame(card, fg_color="transparent")
-        lang_row.pack(fill="x", padx=14, pady=6)
+        lang_row.pack(fill="x", padx=16, pady=6)
 
         lang_options = list(SUPPORTED_LANGUAGES.keys())
-        default_src = self.config.get("mic_source_lang" if is_mic else "speaker_source_lang")
-        default_tgt = self.config.get("mic_target_lang" if is_mic else "speaker_target_lang")
+        default_src = self.config.get("mic_source_lang", "Türkçe (tr)")
+        default_tgt = self.config.get("mic_target_lang", "English (en)")
 
-        src_dropdown = ctk.CTkOptionMenu(
+        self.src_dropdown = ctk.CTkOptionMenu(
             lang_row,
             values=lang_options,
-            command=lambda v: self._on_lang_change(is_mic, True, v),
-            font=FONT_SMALL,
+            command=lambda v: self._on_lang_change(True, v),
+            font=FONT_LABEL,
             fg_color=BG_MAIN,
             button_color=BORDER_COLOR,
-            width=150
+            width=220,
+            height=32
         )
-        src_dropdown.set(default_src)
-        src_dropdown.pack(side="left", padx=(0, 4))
+        self.src_dropdown.set(default_src)
+        self.src_dropdown.pack(side="left", padx=(0, 8))
 
-        arrow_lbl = ctk.CTkLabel(lang_row, text="➔", font=FONT_LABEL, text_color=CYBER_CYAN)
-        arrow_lbl.pack(side="left", padx=4)
+        arrow_lbl = ctk.CTkLabel(lang_row, text="➔", font=FONT_TITLE, text_color=CYBER_CYAN)
+        arrow_lbl.pack(side="left", padx=8)
 
-        tgt_dropdown = ctk.CTkOptionMenu(
+        self.tgt_dropdown = ctk.CTkOptionMenu(
             lang_row,
             values=lang_options,
-            command=lambda v: self._on_lang_change(is_mic, False, v),
-            font=FONT_SMALL,
+            command=lambda v: self._on_lang_change(False, v),
+            font=FONT_LABEL,
             fg_color=BG_MAIN,
             button_color=BORDER_COLOR,
-            width=150
+            width=220,
+            height=32
         )
-        tgt_dropdown.set(default_tgt)
-        tgt_dropdown.pack(side="left", padx=(4, 0))
+        self.tgt_dropdown.set(default_tgt)
+        self.tgt_dropdown.pack(side="left", padx=(8, 0))
 
         # Device Selection Helper
         self.mic_devices = self._get_unique_input_devices()
         self.mic_device_names = [d["name"] for d in self.mic_devices]
 
-        # Slider / Threshold & Device Control Row
         device_row = ctk.CTkFrame(card, fg_color="transparent")
-        device_row.pack(fill="x", padx=14, pady=(2, 4))
+        device_row.pack(fill="x", padx=16, pady=(4, 6))
 
-        if is_mic:
-            lbl_dev = ctk.CTkLabel(device_row, text=self._t("device_select"), font=FONT_SMALL, text_color=TEXT_SECONDARY)
-            lbl_dev.pack(side="left", padx=(0, 6))
+        self.lbl_mic_dev = ctk.CTkLabel(device_row, text=self._t("device_select"), font=FONT_LABEL, text_color=TEXT_SECONDARY)
+        self.lbl_mic_dev.pack(side="left", padx=(0, 8))
 
-            dev_values = self.mic_device_names if self.mic_device_names else ["Varsayılan Mikrofon (Default)"]
-            saved_dev = self.config.get("mic_device_name", dev_values[0])
-            if saved_dev not in dev_values:
-                saved_dev = dev_values[0]
+        dev_values = self.mic_device_names if self.mic_device_names else ["Varsayılan Mikrofon (Default)"]
+        saved_dev = self.config.get("mic_device_name", dev_values[0])
+        if saved_dev not in dev_values:
+            saved_dev = dev_values[0]
 
-            self.mic_dev_menu = ctk.CTkOptionMenu(
-                device_row,
-                values=dev_values,
-                command=self._on_mic_device_change,
-                font=FONT_SMALL,
-                fg_color=BG_MAIN,
-                button_color=BORDER_COLOR,
-                height=26
-            )
-            self.mic_dev_menu.set(saved_dev)
-            self.mic_dev_menu.pack(side="left", fill="x", expand=True)
-            self.lbl_mic_dev = lbl_dev
+        self.mic_dev_menu = ctk.CTkOptionMenu(
+            device_row,
+            values=dev_values,
+            command=self._on_mic_device_change,
+            font=FONT_LABEL,
+            fg_color=BG_MAIN,
+            button_color=BORDER_COLOR,
+            height=30
+        )
+        self.mic_dev_menu.set(saved_dev)
+        self.mic_dev_menu.pack(side="left", fill="x", expand=True)
 
+        # Silence Slider Row
         slider_row = ctk.CTkFrame(card, fg_color="transparent")
-        slider_row.pack(fill="x", padx=14, pady=4)
+        slider_row.pack(fill="x", padx=16, pady=4)
 
-        if is_mic:
-            slider_lbl = ctk.CTkLabel(
-                slider_row,
-                text=f"{self._t('silence_wait')}: {self.config.get('mic_pause_threshold', 1.2)}s",
-                font=FONT_SMALL,
-                text_color=TEXT_SECONDARY
-            )
-            slider_lbl.pack(side="left")
+        self.lbl_mic_pause = ctk.CTkLabel(
+            slider_row,
+            text=f"{self._t('silence_wait')}: {self.config.get('mic_pause_threshold', 1.2)}s",
+            font=FONT_SMALL,
+            text_color=TEXT_SECONDARY
+        )
+        self.lbl_mic_pause.pack(side="left")
 
-            slider = ctk.CTkSlider(
-                slider_row,
-                from_=0.5,
-                to=3.0,
-                number_of_steps=25,
-                command=lambda v: self._on_mic_slider(slider_lbl, v),
-                progress_color=NEON_PURPLE,
-                button_color=CYBER_CYAN
-            )
-            slider.set(self.config.get("mic_pause_threshold", 1.2))
-            slider.pack(side="right", fill="x", expand=True, padx=(10, 0))
-            self.lbl_mic_title = title_lbl
-            self.lbl_mic_hotkey = hotkey_lbl
-            self.lbl_mic_pause = slider_lbl
-            self.slider_mic_pause = slider
-            self.lbl_mic_status = status_lbl
-            self.switch_mic_var = switch_var
-            self.switch_mic = switch
-        else:
-            slider_lbl = ctk.CTkLabel(
-                slider_row,
-                text=f"{self._t('sound_thresh')}: {self.config.get('speaker_energy_threshold', 400)} RMS",
-                font=FONT_SMALL,
-                text_color=TEXT_SECONDARY
-            )
-            slider_lbl.pack(side="left")
-
-            slider = ctk.CTkSlider(
-                slider_row,
-                from_=100,
-                to=1500,
-                number_of_steps=28,
-                command=lambda v: self._on_speaker_slider(slider_lbl, v),
-                progress_color=CYBER_CYAN,
-                button_color=NEON_BLUE
-            )
-            slider.set(self.config.get("speaker_energy_threshold", 400))
-            slider.pack(side="right", fill="x", expand=True, padx=(10, 0))
-            self.lbl_spk_title = title_lbl
-            self.lbl_spk_hotkey = hotkey_lbl
-            self.lbl_spk_thresh = slider_lbl
-            self.slider_spk_thresh = slider
-            self.lbl_spk_status = status_lbl
-            self.switch_spk_var = switch_var
-            self.switch_spk = switch
+        self.slider_mic_pause = ctk.CTkSlider(
+            slider_row,
+            from_=0.5,
+            to=3.0,
+            number_of_steps=25,
+            command=lambda v: self._on_mic_slider(v),
+            progress_color=NEON_PURPLE,
+            button_color=CYBER_CYAN
+        )
+        self.slider_mic_pause.set(self.config.get("mic_pause_threshold", 1.2))
+        self.slider_mic_pause.pack(side="right", fill="x", expand=True, padx=(10, 0))
 
         # Terminal Log Console
-        log_box = ctk.CTkTextbox(
+        self.txt_mic_logs = ctk.CTkTextbox(
             card,
             font=FONT_MONO,
             fg_color=BG_TERMINAL,
@@ -379,14 +307,34 @@ class AppWindow(ctk.CTk):
             border_width=1,
             corner_radius=8
         )
-        log_box.pack(fill="both", expand=True, padx=14, pady=(6, 12))
+        self.txt_mic_logs.pack(fill="both", expand=True, padx=16, pady=(8, 14))
 
-        if is_mic:
-            self.txt_mic_logs = log_box
-        else:
-            self.txt_spk_logs = log_box
+    def _get_unique_input_devices(self):
+        """Lists distinct microphone input devices."""
+        import speech_recognition as sr
+        devices = [{"name": "Varsayılan Mikrofon (Default)", "index": None}]
+        try:
+            names = sr.Microphone.list_microphone_names()
+            seen = set()
+            for idx, name in enumerate(names):
+                clean_name = name.strip()
+                if clean_name not in seen and ("Mikrofon" in clean_name or "Microphone" in clean_name or "Input" in clean_name):
+                    seen.add(clean_name)
+                    devices.append({"name": f"[{idx}] {clean_name}", "index": idx})
+        except Exception:
+            pass
+        return devices
 
-        return card
+    def _on_mic_device_change(self, selected_name: str):
+        self.config.set("mic_device_name", selected_name)
+        dev_index = None
+        for d in self.mic_devices:
+            if d["name"] == selected_name:
+                dev_index = d["index"]
+                break
+        self.config.set("mic_device_index", dev_index)
+        self.mic_engine.set_device_index(dev_index)
+        self.log_mic(f"🎤 Mikrofon Cihazı Seçildi: {selected_name}")
 
     def _build_quick_osc_bar(self):
         """Quick Direct Input Bar to test OSC or send manual message without speaking"""
@@ -435,54 +383,19 @@ class AppWindow(ctk.CTk):
             footer,
             text=self._t("clear_logs_btn"),
             font=FONT_SMALL,
-            fg_color="transparent",
-            border_color=BORDER_COLOR,
-            border_width=1,
-            hover_color=BG_CARD,
-            text_color=TEXT_SECONDARY,
-            height=26,
-            command=self._clear_logs
+            fg_color=BG_CARD,
+            hover_color=BORDER_COLOR,
+            command=self._clear_logs,
+            width=110,
+            height=26
         )
         self.clear_btn.pack(side="right")
 
-    # -------------------------------------------------------------
-    # LOCALIZATION CONTROLLER
-    # -------------------------------------------------------------
-    def _on_ui_lang_change(self, selected: str):
-        if "Türkçe" in selected:
-            self.current_locale = "tr"
-        else:
-            self.current_locale = "en"
-        self.config.set("ui_lang", self.current_locale)
+    def _on_ui_lang_change(self, val: str):
+        locale_code = "tr" if "Türkçe" in val else "en"
+        self.current_locale = locale_code
+        self.config.set("ui_lang", locale_code)
         self._apply_ui_locale()
-
-    def _get_unique_input_devices(self):
-        """Lists distinct microphone input devices."""
-        import speech_recognition as sr
-        devices = [{"name": "Varsayılan Mikrofon (Default)", "index": None}]
-        try:
-            names = sr.Microphone.list_microphone_names()
-            seen = set()
-            for idx, name in enumerate(names):
-                # Clean up display name
-                clean_name = name.strip()
-                if clean_name not in seen and ("Mikrofon" in clean_name or "Microphone" in clean_name or "Input" in clean_name):
-                    seen.add(clean_name)
-                    devices.append({"name": f"[{idx}] {clean_name}", "index": idx})
-        except Exception:
-            pass
-        return devices
-
-    def _on_mic_device_change(self, selected_name: str):
-        self.config.set("mic_device_name", selected_name)
-        dev_index = None
-        for d in self.mic_devices:
-            if d["name"] == selected_name:
-                dev_index = d["index"]
-                break
-        self.config.set("mic_device_index", dev_index)
-        self.mic_engine.set_device_index(dev_index)
-        self.log_mic(f"🎤 Mikrofon Cihazı Seçildi: {selected_name}")
 
     def _apply_ui_locale(self):
         """Updates all UI text elements instantly without app restart."""
@@ -497,10 +410,6 @@ class AppWindow(ctk.CTk):
             self.lbl_mic_dev.configure(text=self._t("device_select"))
         self.lbl_mic_pause.configure(text=f"{self._t('silence_wait')}: {self.config.get('mic_pause_threshold', 1.2)}s")
 
-        self.lbl_spk_title.configure(text=self._t("speaker_title"))
-        self.lbl_spk_hotkey.configure(text=self._t("speaker_hotkey"))
-        self.lbl_spk_thresh.configure(text=f"{self._t('sound_thresh')}: {self.config.get('speaker_energy_threshold', 400)} RMS")
-
         self.quick_label.configure(text=self._t("quick_label"))
         self.quick_send_btn.configure(text=self._t("quick_send_btn"))
         self.quick_input.configure(placeholder_text=self._t("quick_placeholder"))
@@ -508,61 +417,35 @@ class AppWindow(ctk.CTk):
         self.info_lbl.configure(text=self._t("tip_info"))
         self.clear_btn.configure(text=self._t("clear_logs_btn"))
 
-        # Update active statuses
         if self.switch_mic_var.get() == "on":
             self.lbl_mic_status.configure(text=self._t("status_on"))
         else:
             self.lbl_mic_status.configure(text=self._t("status_off"))
 
-        if self.switch_spk_var.get() == "on":
-            self.lbl_spk_status.configure(text=self._t("status_on"))
-        else:
-            self.lbl_spk_status.configure(text=self._t("status_off"))
-
-    # -------------------------------------------------------------
-    # EVENT HANDLERS & LOGIC
-    # -------------------------------------------------------------
     def _toggle_topmost(self):
         val = self.topmost_var.get()
         self.attributes("-topmost", val)
         self.config.set("always_on_top", val)
 
-    def _on_lang_change(self, is_mic: bool, is_source: bool, value: str):
+    def _on_lang_change(self, is_source: bool, value: str):
         code = SUPPORTED_LANGUAGES.get(value, "en")
-        if is_mic:
-            if is_source:
-                self.config.set("mic_source_lang", value)
-                self.mic_engine.set_stt_language(code)
-            else:
-                self.config.set("mic_target_lang", value)
-            src = SUPPORTED_LANGUAGES.get(self.config.get("mic_source_lang"), "tr")
-            tgt = SUPPORTED_LANGUAGES.get(self.config.get("mic_target_lang"), "en")
-            self.mic_translator.set_languages(src, tgt)
-            msg = self._t("lang_changed_mic").format(src=src, tgt=tgt)
-            self.log_mic(msg)
+        if is_source:
+            self.config.set("mic_source_lang", value)
+            self.mic_engine.set_stt_language(code)
         else:
-            if is_source:
-                self.config.set("speaker_source_lang", value)
-                self.speaker_engine.set_stt_language(code)
-            else:
-                self.config.set("speaker_target_lang", value)
-            src = SUPPORTED_LANGUAGES.get(self.config.get("speaker_source_lang"), "en")
-            tgt = SUPPORTED_LANGUAGES.get(self.config.get("speaker_target_lang"), "tr")
-            self.speaker_translator.set_languages(src, tgt)
-            msg = self._t("lang_changed_spk").format(src=src, tgt=tgt)
-            self.log_speaker(msg)
+            self.config.set("mic_target_lang", value)
 
-    def _on_mic_slider(self, label, value):
+        src = SUPPORTED_LANGUAGES.get(self.config.get("mic_source_lang"), "tr")
+        tgt = SUPPORTED_LANGUAGES.get(self.config.get("mic_target_lang"), "en")
+        self.mic_translator.set_languages(src, tgt)
+        msg = self._t("lang_changed_mic").format(src=src, tgt=tgt)
+        self.log_mic(msg)
+
+    def _on_mic_slider(self, value):
         rounded = round(float(value), 1)
-        label.configure(text=f"{self._t('silence_wait')}: {rounded}s")
+        self.lbl_mic_pause.configure(text=f"{self._t('silence_wait')}: {rounded}s")
         self.mic_engine.set_pause_threshold(rounded)
         self.config.set("mic_pause_threshold", rounded)
-
-    def _on_speaker_slider(self, label, value):
-        val = int(value)
-        label.configure(text=f"{self._t('sound_thresh')}: {val} RMS")
-        self.speaker_engine.set_energy_threshold(val)
-        self.config.set("speaker_energy_threshold", val)
 
     def _send_quick_message(self):
         text = self.quick_input.get().strip()
@@ -577,7 +460,6 @@ class AppWindow(ctk.CTk):
 
     def _clear_logs(self):
         self.txt_mic_logs.delete("1.0", "end")
-        self.txt_spk_logs.delete("1.0", "end")
 
     # -------------------------------------------------------------
     # MICROPHONE CHANNEL LOGIC
@@ -622,79 +504,25 @@ class AppWindow(ctk.CTk):
         self.txt_mic_logs.see("end")
 
     # -------------------------------------------------------------
-    # SPEAKER CHANNEL LOGIC
-    # -------------------------------------------------------------
-    def _on_speaker_toggle(self):
-        if self.switch_spk_var.get() == "on":
-            self.lbl_spk_status.configure(text=self._t("status_busy"), text_color=STATUS_BUSY, fg_color="#332205")
-            self.switch_spk.configure(state="disabled")
-            threading.Thread(target=self._start_speaker_worker, daemon=True).start()
-        else:
-            self.speaker_engine.stop_listening()
-            self.lbl_spk_status.configure(text=self._t("status_off"), text_color=STATUS_OFFLINE, fg_color="#2D1215")
-            self.log_speaker(self._t("speaker_stopped"))
-
-    def _start_speaker_worker(self):
-        try:
-            self.speaker_engine.start_listening(
-                on_translation=lambda src, trans: self.after(0, self._on_speaker_result, src, trans),
-                on_status=lambda st: self.after(0, self.log_speaker, st)
-            )
-            self.after(0, self._ui_speaker_started)
-        except Exception as e:
-            self.after(0, self._ui_speaker_failed, str(e))
-
-    def _ui_speaker_started(self):
-        self.switch_spk.configure(state="normal")
-        self.lbl_spk_status.configure(text=self._t("status_on"), text_color=STATUS_ONLINE, fg_color="#0D281E")
-
-    def _ui_speaker_failed(self, err: str):
-        self.switch_spk.configure(state="normal")
-        self.switch_spk_var.set("off")
-        self.lbl_spk_status.configure(text=self._t("status_err"), text_color=STATUS_OFFLINE, fg_color="#2D1215")
-        self.log_speaker(f"🔴 Error: {err}")
-
-    def _on_speaker_result(self, src: str, trans: str):
-        ts = time.strftime("%H:%M:%S")
-        self.log_speaker(f"[{ts}] {self._t('other_label')}: {src}")
-        self.log_speaker(f"[{ts}] {self._t('tr_label')}: {trans}\n")
-
-    def log_speaker(self, msg: str):
-        self.txt_spk_logs.insert("end", f"{msg}\n")
-        self.txt_spk_logs.see("end")
-
-    # -------------------------------------------------------------
-    # GLOBAL HOTKEYS (F4 & F5)
+    # GLOBAL HOTKEYS (F4)
     # -------------------------------------------------------------
     def _start_hotkey_thread(self):
         t = threading.Thread(target=self._hotkey_listener_loop, daemon=True, name="HotkeyThread")
         t.start()
 
     def _hotkey_listener_loop(self):
-        """Asynchronous Windows hotkey polling via GetAsyncKeyState (VK_F4=0x73, VK_F5=0x74)"""
+        """Asynchronous Windows hotkey polling via GetAsyncKeyState (VK_F4=0x73)"""
         VK_F4 = 0x73
-        VK_F5 = 0x74
         f4_down = False
-        f5_down = False
 
         while True:
             try:
-                # Check F4 (Mic Toggle)
                 is_f4 = bool(ctypes.windll.user32.GetAsyncKeyState(VK_F4) & 0x8000)
                 if is_f4 and not f4_down:
                     f4_down = True
                     self.after(0, self._toggle_mic_hotkey)
                 elif not is_f4:
                     f4_down = False
-
-                # Check F5 (Speaker Toggle)
-                is_f5 = bool(ctypes.windll.user32.GetAsyncKeyState(VK_F5) & 0x8000)
-                if is_f5 and not f5_down:
-                    f5_down = True
-                    self.after(0, self._toggle_speaker_hotkey)
-                elif not is_f5:
-                    f5_down = False
-
             except Exception:
                 pass
             time.sleep(0.06)
@@ -704,9 +532,3 @@ class AppWindow(ctk.CTk):
         new_val = "off" if current == "on" else "on"
         self.switch_mic_var.set(new_val)
         self._on_mic_toggle()
-
-    def _toggle_speaker_hotkey(self):
-        current = self.switch_spk_var.get()
-        new_val = "off" if current == "on" else "on"
-        self.switch_spk_var.set(new_val)
-        self._on_speaker_toggle()

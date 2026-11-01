@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
 
 # 🌐 EchoBridge
 ### Real-time AI Voice Translator for VRChat · v2.5
@@ -12,10 +12,10 @@
 
 <br/>
 
-**Real-time AI-powered translator for VRChat** — Speak in your language, everyone understands.  
-Dual-channel: **Mic → VRChat Chatbox** and **Game Audio → UI overlay**.
+**Real-time AI-powered speech translator for VRChat** — Speak in your native language, and let your avatar communicate with the world.  
+Seamless pipeline: **Microphone Input → Multi-Engine AI Translation → VRChat Avatar Chatbox via OSC**.
 
-[🚀 Download EXE](#-quick-start) · [📖 English Setup Guide](SETUP_GUIDE_EN.md) · [📖 Türkçe Kurulum](SETUP_GUIDE_TR.md) · [⚠️ Known Limitations](TECHNICAL_LIMITATIONS.md) · [🐛 Report Bug](https://github.com/Zpati/EchoBridge/issues)
+[🚀 Download EXE](#-quick-start) · [📖 English Setup Guide](SETUP_GUIDE_EN.md) · [📖 Türkçe Kurulum](SETUP_GUIDE_TR.md) · [🐛 Report Bug](https://github.com/Zpati/EchoBridge/issues)
 
 </div>
 
@@ -25,36 +25,29 @@ Dual-channel: **Mic → VRChat Chatbox** and **Game Audio → UI overlay**.
 
 | Feature | Description |
 |---|---|
-| 🎤 **Mic → VRChat** | Speak → AI detects language → Translates → Sends to VRChat Chatbox via OSC |
-| 🎮 **Game Audio → UI** | Captures all system audio → Transcribes → Translates → Shows in overlay |
-| 🌍 **50+ Languages** | Powered by Google Translate + MyMemory fallback |
-| 🎨 **Cyberpunk HUD** | Dark neon UI, always-on-top overlay |
-| 🌐 **EN / TR Interface** | Hot-swap UI language without restart |
-| ⌨️ **Global Hotkeys** | F4 (Mic), F5 (Game Audio) — works while VRChat is focused |
-| 📦 **Standalone EXE** | No Python install needed — just download and run |
-| 🔇 **Noise Calibration** | Dynamic RMS threshold slider to filter background noise |
-| 💬 **Typing Indicator** | VRChat `/chatbox/typing` simulation for natural feel |
-| 📋 **Translation Cache** | 200-item LRU cache for instant repeat translations |
+| 🎤 **Mic → VRChat** | Speak into your mic → Speech recognized → Instantly translated → Sent to your VRChat avatar's chatbox via OSC |
+| 🎛️ **Audio Device Selector** | Choose any connected microphone directly from the UI dropdown |
+| 🛡️ **Resilient Fallbacks** | Multi-tier translation pipeline (Google Translator + direct MyMemory REST API fallback) |
+| 🌍 **Multi-Language Support** | Türkçe, English, Japanese, Korean, German, French, Spanish, Russian, Chinese, Italian, Arabic |
+| 🎨 **Cyberpunk HUD** | Clean dark neon UI with Always-on-Top overlay support |
+| 🌐 **EN / TR Interface** | Hot-swap UI language instantly without restarting the app |
+| ⌨️ **Global Hotkey** | Press **F4** anywhere to toggle listening on/off (works while VRChat has focus) |
+| 📦 **Standalone EXE** | Download and run — no Python installation needed |
+| 💬 **Typing Indicator** | Simulates native VRChat `/chatbox/typing` for realistic conversations |
+| 📋 **Translation Cache** | In-memory LRU cache prevents duplicate translations and lag |
 
 ---
 
 ## 🏗️ Architecture
 
 ```mermaid
-graph TD
+graph LR
     A[🎤 Microphone Input] -->|SpeechRecognition| B[MicEngine]
-    B -->|Google STT| C[TranslationEngine]
-    C -->|Google Translate / MyMemory| D[OSC Client]
-    D -->|UDP :9000| E[🥽 VRChat Avatar Chatbox]
-
-    F[🔊 System Audio / Game] -->|WASAPI Loopback| G[SpeakerEngine]
-    G -->|Google STT| H[TranslationEngine]
-    H --> I[📱 UI Overlay Log]
-
-    J[ConfigManager] <-->|JSON| K[App Settings]
-    L[AppWindow CyberHUD] --> B
-    L --> G
-    L --> D
+    B -->|Audio Stream| C[Multi-Tier STT Engine]
+    C -->|Text| D[TranslationEngine<br/>Google + MyMemory]
+    D -->|Translated Text| E[VRChatOSCClient]
+    E -->|UDP :9000 OSC| F[🥽 VRChat Avatar Chatbox]
+    D -->|Live Log| G[CyberHUD UI Console]
 ```
 
 ---
@@ -63,11 +56,11 @@ graph TD
 
 ### Option A — Standalone EXE (Recommended, No Python Needed)
 
-1. Download the latest release zip from [Releases](https://github.com/Zpati/EchoBridge/releases)
-2. Extract the zip
-3. Open VRChat → **Settings → OSC → Enable OSC**
-4. Run `EchoBridge.exe`
-5. Select your mic language, target language, and hit **START**
+1. Download the latest release package from [Releases](https://github.com/Zpati/EchoBridge/releases)
+2. Extract the downloaded zip file
+3. Launch VRChat → **Action Menu (R) → Options → OSC → Enabled (ON)**
+4. Run **`EchoBridge.exe`**
+5. Select your microphone, choose your languages, and press **START** (or hit **F4**)
 
 ### Option B — Run from Source (Python 3.10+)
 
@@ -78,22 +71,20 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Or just double-click **`run.bat`**.
+Or simply double-click **`run.bat`**.
 
 ---
 
 ## ⚙️ VRChat OSC Setup
 
 > [!IMPORTANT]
-> OSC must be enabled in VRChat for translation to appear in your chatbox.
+> OSC must be turned ON in VRChat for translated messages to appear in your avatar's chatbox.
 
 1. Launch VRChat
-2. Open **Main Menu → Settings**
-3. Scroll to **OSC** section
-4. Toggle **Enable OSC** → **ON**
-5. Confirm ports: **Input 9000**, Output 9001 (default)
-
-See the full Turkish guide: [SETUP_GUIDE_TR.md](SETUP_GUIDE_TR.md)
+2. Press **R** (desktop) or open your radial action menu in VR
+3. Select **Options** → **OSC**
+4. Toggle **Enabled** to **ON**
+5. EchoBridge connects automatically to standard OSC port (`127.0.0.1:9000`).
 
 ---
 
@@ -101,104 +92,34 @@ See the full Turkish guide: [SETUP_GUIDE_TR.md](SETUP_GUIDE_TR.md)
 
 | Key | Action |
 |-----|--------|
-| `F4` | Toggle Mic Translation (You → VRChat) |
-| `F5` | Toggle Game Audio Capture (Game → UI) |
-
-Hotkeys work globally — even when VRChat window is in focus.
-
----
-
-## 📊 V1 vs V2.5 Comparison
-
-| Feature | V1 (Original) | V2.5 Enterprise |
-|---------|--------------|-----------------|
-| UI | Basic tkinter | Cyberpunk CyberHUD (CustomTkinter) |
-| Translation engine | Single API | Google Translate + MyMemory fallback |
-| Game audio capture | ❌ | ✅ WASAPI Loopback |
-| Hotkeys | ❌ | ✅ F4/F5 global |
-| Language switcher | ❌ | ✅ EN/TR hot-swap |
-| Standalone EXE | ❌ | ✅ PyInstaller |
-| Translation cache | ❌ | ✅ 200-item LRU |
-| Noise calibration | ❌ | ✅ Dynamic RMS slider |
-| Config persistence | ❌ | ✅ JSON config |
-
----
-
-## 🏗️ Build from Source (EXE)
-
-```bash
-pip install pyinstaller
-build.bat
-```
-
-Output: `dist/EchoBridge/EchoBridge.exe`
-
-> [!NOTE]
-> Build excludes torch, tensorflow, scipy, matplotlib to keep EXE lightweight (~8MB core + dependencies).
+| `F4` | Toggle Microphone Translation ON/OFF |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-VRChat_Translator/
-├── main.py                    # Entry point
+EchoBridge/
+├── main.py                    # Application Entry Point
 ├── run.bat                    # Quick launch script
 ├── build.bat                  # PyInstaller build script
-├── requirements.txt
+├── requirements.txt           # Python dependencies
 ├── assets/
-│   ├── icon.png               # 512x512 app icon
-│   └── icon.ico               # Multi-resolution ICO (7 sizes)
+│   ├── icon.png               # High-res app icon
+│   └── icon.ico               # Multi-resolution Windows ICO (7 frames)
 ├── src/
-│   ├── main.py
-│   ├── config.py              # ConfigManager (JSON settings)
-│   └── ui/
-│       ├── app_window.py      # Main CyberHUD window
-│       ├── theme.py           # Cyberpunk color palette
-│       └── locales.py         # EN/TR string tables
+│   ├── config.py              # Persistent settings manager (config.json)
+│   ├── ui/
+│   │   ├── app_window.py      # Streamlined single-channel CyberHUD window
+│   │   ├── theme.py           # Cyberpunk neon color palette
+│   │   └── locales.py         # EN / TR string tables
 │   └── core/
-│       ├── translator.py      # TranslationEngine + cache
-│       ├── mic_engine.py      # Microphone STT + OSC bridge
-│       ├── speaker_engine.py  # WASAPI Loopback capture
-│       └── osc_client.py      # VRChat OSC UDP client
-├── SETUP_GUIDE_TR.md          # Turkish OSC setup guide
-├── TECHNICAL_LIMITATIONS.md  # Known issues & roadmap
-└── LICENSE                    # MIT
-```
-
----
-
-## ⚠️ Known Limitations
-
-| Issue | Status |
-|-------|--------|
-| Game audio captures ALL system sounds (not just VRChat) | By design — use RMS threshold slider |
-| Google Translate rate-limit on heavy use | MyMemory fallback active |
-| Game audio → translation lag ~2-4s | Inherent to STT pipeline |
-| No speaker diarization (who said what) | Planned for v3.0 |
-| Requires internet connection | Offline mode planned |
-
-Full technical analysis: [TECHNICAL_LIMITATIONS.md](TECHNICAL_LIMITATIONS.md)
-
----
-
-## 🛠️ Requirements
-
-- Windows 10 / 11 (64-bit)
-- Microphone (for Mic channel)
-- Internet connection (for translation APIs)
-- VRChat with OSC enabled
-
-**Python dependencies** (for source run):
-```
-customtkinter>=5.2.0
-speechrecognition>=3.10.0
-pyaudio>=0.2.13
-pyaudiowpatch>=0.2.12
-deep-translator>=1.11.4
-python-osc>=1.8.3
-keyboard>=0.13.5
-Pillow>=10.0.0
+│       ├── translator.py      # Multi-engine translation with MyMemory fallback
+│       ├── mic_engine.py      # Microphone capture & device selection
+│       └── osc_client.py      # VRChat OSC UDP bridge
+├── SETUP_GUIDE_EN.md          # English setup guide
+├── SETUP_GUIDE_TR.md          # Türkçe kurulum rehberi
+└── LICENSE                    # MIT License
 ```
 
 ---
@@ -219,5 +140,3 @@ Made with ❤️ for the VRChat community
 > 💡 *This project was our original idea. AI was used as a development assistant during the coding process.*
 
 </div>
-
-

@@ -9,7 +9,7 @@ Bu rehber, EchoBridge uygulamasının sizin veya başka bir kullanıcının bilg
 **Evet! Kesinlikle ve en pratik şekilde çalışır.**
 
 Artık projenin içinde derlenmiş hazır bir `.exe` bulunmaktadır:
-* ZIP'i çıkardıktan sonra **`EchoBridge.exe`** dosyasına çift tıklamanız yeterlidir.
+* ZIP'i çıkardıktan sonra doğrudan **`EchoBridge.exe`** dosyasına çift tıklamanız yeterlidir.
 * Karşı taraftaki kişinin bilgisayarında **Python, terminal, kod veya bat dosyasıyla hiçbir işi yoktur.**
 * Doğrudan çalışır ve sağ üstteki menüden arayüz dilini anında **English** veya **Türkçe** yapabilirsiniz.
 
@@ -31,7 +31,7 @@ Python veya başka bir şey kurmanıza **gerek yoktur**. Direkt `EchoBridge.exe`
 ### B) Kaynak Koddan Çalıştırıyorsanız (Geliştirici):
 1. [python.org](https://www.python.org/downloads/) adresinden güncel Python sürümünü indirin.
 2. ⚠️ **ÖNEMLİ:** Kurulum ekranının altındaki **"Add python.exe to PATH"** kutucuğunu mutlaka işaretleyin!
-3. Klasörün içinde boş bir yere `Shift + Sağ Tık` yapıp **"PowerShell Penceresini Buradan Aç"** (veya Terminal) deyin:
+3. Klasörün içinde boş bir yere `Shift + Sağ Tık` yapıp **"PowerShell Penceresini Buradan Aç"** deyin:
 ```bash
 pip install -r requirements.txt
 ```
@@ -66,29 +66,15 @@ VRChat'te chatbox balonuna yazı gönderebilmek için oyun içinden **OSC** öze
 
 ### 🎙️ Mikrofon Çevirisi (Siz ➔ VRChat):
 * Dil kutularından kaynak dili (örn. **Türkçe**) ve hedef dili (örn. **English**) seçin.
+* **Ses Cihazı (Audio Device)** menüsünden kullandığınız kulaklık veya mikrofonu seçin.
 * Açma/kapama anahtarını açın veya klavyenizden **`F4`** tuşuna basın.
 * Mikrofona konuştuğunuzda:
-  1. Sesiniz algılanır ve Türkçesi yazılır.
-  2. Yapay zeka İngilizceye çevirir.
-  3. VRChat başınızın üstündeki sohbet balonunda otomatik olarak İngilizce metin görünür!
-
-### 🔊 Oyun Sesi Çevirisi (VRChat ➔ Siz):
-* Dil kutularından kaynak dili (örn. **English**) ve hedef dili (örn. **Türkçe**) seçin.
-* Açma/kapama anahtarını açın veya klavyenizden **`F5`** tuşuna basın.
-* Karşı taraf konuştuğunda sistem sesi yakalar ve arayüzdeki sağ panele Türkçe çevirisini yazar.
-* *Detaylı optimizasyon ve gürültü ayarları için `TECHNICAL_LIMITATIONS.md` dosyasını inceleyin.*
+  1. Sesiniz algılanır ve Türkçesi arayüze yazılır.
+  2. Yapay zeka İngilizceye çevirir (Google Translate veya MyMemory yedek hattı ile).
+  3. VRChat avatarınızın başının üstündeki sohbet balonunda otomatik olarak çevrilmiş metin görünür!
 
 ### 💬 Hızlı OSC Test Barı:
 * Arayüzün en altındaki metin kutusuna herhangi bir mesaj yazıp Enter'a basarak VRChat bağlantınızı saniyeler içinde test edebilirsiniz.
-
----
-
-## 📦 4. Adım: EXE Haline Getirme (Kaynak Koddan)
-
-Kaynak koddan kendiniz derlemek isterseniz:
-1. Klasördeki **`build.bat`** dosyasına çift tıklayın.
-2. PyInstaller projeyi otomatik olarak `dist\EchoBridge\` klasörüne derleyecektir.
-3. O klasörü zipleyip istediğiniz kişiye gönderebilirsiniz!
 
 ---
 
